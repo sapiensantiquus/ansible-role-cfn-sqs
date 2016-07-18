@@ -1,0 +1,28 @@
+---
+# tasks file for ansible-role-cfn-sqs
+
+- name: Create build directory
+  file:
+    dest: build
+    state: directory
+
+- name: Template queue
+  template:
+    src: sqs.json.j2
+    dest: "build/sqs.{{ sqs_stack_name }}.json"
+
+- name: Create or remove cloudformation stack
+  cloudformation:
+    template_parameters:
+      DelaySeconds: "{{ sqs_delay_seconds }}"
+      QueueName: "{{ sqs_queue_name }}"
+      DeadLetterTargetArn: "{{ sqs_dlq_arn }}"
+    stack_name: "{{ sqs_stack_name }}"
+    region: "{{ region }}"
+    template: "build/sqs.{{ sqs_stack_name }}.json"
+    security_token: "{{ lookup('env','AWS_SESSION_TOKEN')|default(omit, true) }}"
+    tags: "{{ sqs_tags }}"
+    state: "{{ sqs_stack_state|default('present') }}"
+  register: sqs_cf_output
+
+- debug: msg="{{ sqs_cf_output }}" verbosity=1

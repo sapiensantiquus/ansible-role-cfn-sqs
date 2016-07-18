@@ -1,0 +1,25 @@
+---
+- name: test creation and usage of first queue as DLQ for a second queue
+  hosts: test
+  remote_user: root
+  vars:
+    region: "us-west-2"
+  roles:
+    - role: ansible-role-cfn-sqs
+      sqs_stack_name: "test-ansible-role-cfn-sqs"
+    - role: ansible-role-cfn-sqs
+      sqs_stack_name: "test-ansible-role-cfn-sqs-2"
+      sqs_dlq_arn: "{{ sqs_cf_output.stack_outputs.QueueARN }}"
+
+- name: test removal of queues
+  hosts: test
+  remote_user: root
+  vars:
+    region: "us-west-2"
+  roles:
+    - role: ansible-role-cfn-sqs
+      sqs_stack_name: "test-ansible-role-cfn-sqs"
+      sqs_stack_state: "absent"
+    - role: ansible-role-cfn-sqs
+      sqs_stack_name: "test-ansible-role-cfn-sqs-2"
+      sqs_stack_state: "absent"

@@ -1,0 +1,45 @@
+{
+  "AWSTemplateFormatVersion" : "2010-09-09",
+  "Parameters" : {
+    "QueueName" : {
+      "Type" : "String"
+    },
+    "DeadLetterTargetArn" : {
+      "Type" : "String",
+      "Description" : "the dead letter queue to which the messages are sent to after the maxReceiveCount value has been exceeded"
+    },
+    "DelaySeconds" : {
+      "Type" : "Number",
+      "Description" : "time in seconds that the delivery of all messages in the queue will be delayed"
+    }
+  },
+  "Resources" : {
+    "Queue" : {
+      "Type" : "AWS::SQS::Queue",
+      "Properties" : {
+        {% if sqs_queue_name != '' %}"QueueName": { "Ref": "QueueName" },{% endif %}
+        {% if sqs_dlq_arn != '' %}
+        "RedrivePolicy": {
+          "deadLetterTargetArn" : { "Ref": "DeadLetterTargetArn" },
+          "maxReceiveCount" : "{{ sqs_max_recv_count }}"
+        },
+        {% endif %}
+        {% if sqs_max_msg_size_bytes is defined %}"MaximumMessageSize" : "{{ sqs_max_msg_size_bytes }}",{% endif %}
+        {% if sqs_retention_seconds is defined %}"MessageRetentionPeriod" :  "{{ sqs_retention_seconds }}",{% endif %}
+        {% if sqs_recv_msg_wait_seconds is defined %}"ReceiveMessageWaitTimeSeconds" : "{{ sqs_recv_msg_wait_seconds }}",{% endif %}
+        {% if sqs_vis_timeout_seconds is defined %}"VisibilityTimeout" : "{{ sqs_vis_timeout_seconds }}",{% endif %}
+        "DelaySeconds" : { "Ref": "DelaySeconds" }
+      }
+    }
+  },
+  "Outputs" : {
+    "QueueURL" : {
+      "Description" : "URL of the queue",
+      "Value" : { "Ref" : "Queue" }
+    },
+    "QueueARN" : {
+      "Description" : "ARN of the queue",
+      "Value" : { "Fn::GetAtt" : ["Queue", "Arn"]}
+    }   
+  }
+}

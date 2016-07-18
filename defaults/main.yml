@@ -1,0 +1,7 @@
+---
+# defaults file for ansible-role-cfn-sqs
+sqs_tags: {}
+sqs_queue_name: ""
+sqs_dlq_arn: ""
+sqs_max_recv_count: 1
+sqs_delay_seconds: 0
