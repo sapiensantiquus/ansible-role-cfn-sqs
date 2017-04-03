@@ -4,17 +4,6 @@
   remote_user: root
   vars:
     region: "us-west-2"
-    sqs_queue_policy:
-      "Version": "2012-10-17"
-      "Statement":
-        - "Effect": "Allow"
-          "Principal":
-            "AWS": "*"
-          "Action": "SQS:SendMessage"
-          "Resource": "*"
-
-
-
   roles:
     - role: ansible-role-cfn-sqs
       sqs_stack_name: "test-ansible-role-cfn-sqs"

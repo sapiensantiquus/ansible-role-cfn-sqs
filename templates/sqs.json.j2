@@ -31,16 +31,6 @@
         "DelaySeconds" : { "Ref": "DelaySeconds" }
       }
     }
-    {% if sqs_queue_policy is defined %}
-    ,
-    "QueuePolicy": {
-      "Type" : "AWS::SQS::QueuePolicy",
-      "Properties" : {
-         "PolicyDocument" : {{ sqs_queue_policy | to_json }},
-         "Queues" : [{ "Ref" : "Queue" }]
-      }
-    }
-    {% endif %}
   },
   "Outputs" : {
     "QueueURL" : {
@@ -50,6 +40,6 @@
     "QueueARN" : {
       "Description" : "ARN of the queue",
       "Value" : { "Fn::GetAtt" : ["Queue", "Arn"]}
-    }
+    }   
   }
 }
